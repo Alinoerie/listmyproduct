@@ -5,17 +5,8 @@
 
 set -e
 
-if [ "$VERCEL_ENV" = "production" ]; then
-  echo "==> [deploy-hook] Production deploy — pushing schema changes to database..."
-  # Load production env vars (set by Vercel from vercel env)
-  set -a
-  source .env.production.local 2>/dev/null || true
-  set +a
-  npx prisma db push --skip-generate --accept-data-loss
-  echo "==> [deploy-hook] Schema push complete."
-else
-  echo "==> [deploy-hook] Preview/dev build — skipping schema push."
-fi
+echo "==> [deploy-hook] Skipping schema push (listmyproduct shares productpixl db)"
+echo "==> [deploy-hook] Starting build..."
 
 # Run the actual build
 echo "==> [deploy-hook] Starting build..."

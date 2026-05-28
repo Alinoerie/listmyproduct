@@ -1,14 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Check } from "lucide-react";
 import { auth, signIn } from "@/lib/auth";
-import { isEmailAuthConfigured } from "@/lib/email/magic-link";
 import { GoogleSignInForm } from "@/components/auth/google-sign-in-form";
 import { EmailSignInForm } from "@/components/auth/email-sign-in-form";
-import { ShowcaseMosaic } from "@/components/marketing/showcase-mosaic";
-import { ListMyProductWordmark } from "@/components/brand/listmyproduct-logo";
-import { loginDestinationLabel } from "@/lib/login-destination";
-import { USP_PILLARS, USP_SUBHEAD, USP_TAGLINE } from "@/lib/marketing-usp";
+import { ListMyProductLogo } from "@/components/brand/productpixl-logo";
 
 function safeCallbackUrl(raw?: string) {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/studio";
@@ -23,7 +18,6 @@ export default async function LoginPage({
   const session = await auth();
   const params = await searchParams;
   const callbackUrl = safeCallbackUrl(params.callbackUrl);
-  const emailEnabled = isEmailAuthConfigured();
 
   if (session?.user?.id) {
     redirect(callbackUrl);
@@ -31,15 +25,12 @@ export default async function LoginPage({
 
   const errorMessage =
     params.error === "OAuthAccountNotLinked"
-      ? "That email is already linked to another sign-in method. Use the same method you signed up with."
+      ? "That email is already linked to another sign-in method."
       : params.error === "Verification"
-        ? "That sign-in link expired or was already used. Request a new one below."
-        : params.error
-          ? "Sign-in failed. Please try again."
-          : null;
-
-  const destinationLabel = loginDestinationLabel(callbackUrl);
-  const showDestinationHint = callbackUrl !== "/studio" && callbackUrl !== "/dashboard";
+      ? "That sign-in link expired or was already used. Request a new one."
+      : params.error
+      ? "Sign-in failed. Please try again."
+      : null;
 
   async function signInWithGoogle() {
     "use server";
@@ -54,113 +45,119 @@ export default async function LoginPage({
   }
 
   return (
-    <div className="flex min-h-screen">
-      <div className="hidden w-1/2 flex-col justify-between bg-[var(--ink)] p-12 text-white lg:flex">
-        <Link href="/" className="flex items-center gap-2">
-          <ListMyProductWordmark size={48} textClassName="text-white" priority />
-        </Link>
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--accent-soft)]">{USP_TAGLINE}</p>
-          <h2 className="mt-3 font-serif text-4xl leading-tight">
-            One photo.
-            <br />
-            <span className="text-[var(--accent-soft)]">Full listing studio.</span>
-          </h2>
-          <p className="mt-4 max-w-md text-sm text-white/70">{USP_SUBHEAD}</p>
-          <ul className="mt-6 space-y-3 text-sm text-white/75">
-            {USP_PILLARS.slice(0, 4).map((pillar) => (
-              <li key={pillar.id} className="flex gap-2">
-                <Check className="h-4 w-4 shrink-0 text-[var(--accent-soft)]" />
-                {pillar.title}
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/guides/ecommerce"
-            className="mt-6 inline-flex text-sm font-medium text-[var(--accent-soft)] underline-offset-2 hover:underline"
+    <div className="flex min-h-screen bg-white">
+      {/* Left panel — decorative (hidden on mobile) */}
+      <div className="hidden w-1/2 flex-col justify-between bg-[#0F0E0D] p-12 lg:flex">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3">
+          <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="6" fill="#F59E0B" />
+            <path d="M10 8h7a4 4 0 010 8h-3v8h-4V8z" fill="white" />
+          </svg>
+          <span
+            className="text-lg font-semibold text-white tracking-tight"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
           >
-            Free: 10-playbook ecommerce guide pack →
-          </Link>
-          <ShowcaseMosaic className="mt-10 max-w-sm opacity-95" />
+            ListMyProduct
+          </span>
+        </Link>
+
+        {/* Copy */}
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#F59E0B] mb-4">
+            For Amazon sellers
+          </p>
+          <h2
+            className="text-4xl font-bold text-white leading-tight"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+          >
+            One photo.<br />Infinite listings.
+          </h2>
+          <p className="mt-4 text-sm text-[#787774] max-w-sm">
+            AI generates Amazon listing copy, A+ content images, and video — from a single product photo.
+          </p>
+          <div className="mt-8 space-y-3">
+            {[
+              "10 free credits on signup",
+              "Amazon US, UK, DE supported",
+              "No credit card required",
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3 text-sm text-[#787774]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
-        <p className="text-xs text-white/40">{USP_TAGLINE} · Amazon & EU marketplaces</p>
+
+        <p className="text-xs text-[#787774]">© 2025 ListMyProduct</p>
       </div>
 
-      <main id="main" className="flex flex-1 flex-col items-center justify-center bg-[var(--background)] px-4 py-12">
-        <div className="w-full max-w-md rounded-3xl border border-[var(--border)] bg-[var(--card)] p-8 shadow-[var(--shadow-lg)] md:p-10">
-          <Link href="/" className="mb-8 inline-flex items-center gap-2 lg:hidden">
-            <ListMyProductWordmark size={44} priority />
+      {/* Right panel — auth form */}
+      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          {/* Mobile logo */}
+          <Link href="/" className="flex items-center gap-2.5 mb-10 lg:hidden">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="6" fill="#F59E0B" />
+              <path d="M10 8h7a4 4 0 010 8h-3v8h-4V8z" fill="white" />
+            </svg>
+            <span
+              className="text-base font-semibold text-[#0F0E0D] tracking-tight"
+              style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+            >
+              ListMyProduct
+            </span>
           </Link>
-          <h1 className="font-serif text-3xl">Sign in</h1>
-          <p className="mt-2 text-[var(--muted-fg)]">
-            {emailEnabled
-              ? "Continue with Google or get a one-click email link — no password."
-              : "Continue with Google to access your studio and credits."}
+
+          <h1
+            className="text-3xl font-bold text-[#0F0E0D]"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+          >
+            Sign in
+          </h1>
+          <p className="mt-2 text-sm text-[#787774]">
+            Continue with Google or get a one-click email link — no password.
           </p>
 
-          {showDestinationHint ? (
-            <p className="mt-4 rounded-xl border border-[var(--teal)]/30 bg-[var(--teal-soft)]/40 px-4 py-3 text-sm">
-              After sign-in you&apos;ll return to <strong>{destinationLabel}</strong>.
-            </p>
-          ) : null}
-
-          {errorMessage ? (
-            <p
-              id="login-error"
-              role="alert"
-              className="mt-6 rounded-xl border border-[var(--error-border)] bg-[var(--error-bg)] px-4 py-3 text-sm text-[var(--error)]"
-            >
+          {errorMessage && (
+            <div className="mt-6 rounded-[8px] border border-[#EAEAEA] bg-[#F9F9F8] px-4 py-3 text-sm text-[#0F0E0D]">
               {errorMessage}
-            </p>
-          ) : null}
+            </div>
+          )}
 
-          <GoogleSignInForm
-            errorDescribedBy={errorMessage ? "login-error" : undefined}
-            action={signInWithGoogle}
-          />
+          <div className="mt-8">
+            <GoogleSignInForm
+              action={signInWithGoogle}
+              errorDescribedBy={undefined}
+            />
+          </div>
 
-          {emailEnabled ? (
-            <>
-              <div className="relative my-8">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-[var(--border)]" />
-                </div>
-                <p className="relative mx-auto w-fit bg-[var(--card)] px-3 text-xs uppercase tracking-wide text-[var(--muted-fg)]">
-                  Or email
-                </p>
-              </div>
-              <EmailSignInForm action={signInWithEmail} />
-            </>
-          ) : null}
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#EAEAEA]" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-white px-3 text-xs text-[#787774]">or continue with email</span>
+            </div>
+          </div>
 
-          <p className="mt-6 text-center text-xs text-[var(--muted-fg)]">
-            New accounts receive 10 free generation credits. By signing in you agree to our{" "}
-            <Link href="/terms" className="underline-offset-2 hover:underline">
+          <EmailSignInForm action={signInWithEmail} />
+
+          <p className="mt-6 text-center text-xs text-[#787774]">
+            By signing in you agree to our{" "}
+            <Link href="/terms" className="underline underline-offset-2 hover:text-[#0F0E0D]">
               Terms
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="underline-offset-2 hover:underline">
+            <Link href="/privacy" className="underline underline-offset-2 hover:text-[#0F0E0D]">
               Privacy Policy
             </Link>
             .
           </p>
-          <p className="mt-4 text-center text-sm">
-            Not ready to sign in?{" "}
-            <Link href="/grader" className="font-medium text-[var(--accent)] underline-offset-2 hover:underline">
-              Grade your listing free →
-            </Link>
-            {" · "}
-            <Link href="/guides/ecommerce" className="font-medium text-[var(--accent)] underline-offset-2 hover:underline">
-              Get the free guide pack →
-            </Link>
-            {" · "}
-            <Link href="/demo" className="font-medium text-[var(--accent)] underline-offset-2 hover:underline">
-              Book a demo →
-            </Link>
-          </p>
-        </div>
-        <div className="mt-10 w-full max-w-md lg:hidden">
-          <ShowcaseMosaic className="opacity-90" />
         </div>
       </main>
     </div>

@@ -1,174 +1,193 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUp,
-  Palette,
-  DownloadSimple,
   Sparkle,
   GridFour,
   Coins,
-  Shield,
-  CreditCard,
-  Star,
-  Users,
+  Translate,
+  Image,
+  VideoCamera,
   CaretDown,
   CaretUp,
+  Plus,
+  Minus,
+  Storefront,
+  ShoppingCart,
+  TiktokLogo,
+  AmazonLogo,
 } from "@phosphor-icons/react";
+import { NotifyMeForm } from "@/components/marketing/notify-me-form";
 
-// ─── SECTION 1: HERO ───────────────────────────────────────────
-
-function NavBar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[#E5E7EB]">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden p-2 text-[#111827]"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
-            </svg>
-          )}
-        </button>
-
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="6" fill="#F59E0B" />
-            <path d="M10 8h7a4 4 0 010 8h-3v8h-4V8z" fill="white" />
-          </svg>
-          <span
-            className="text-lg font-semibold text-[#111827]"
-            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
-          >
-            ListMyProduct
-          </span>
-        </Link>
-
-        {/* Spacer */}
-        <div className="w-10 md:hidden" />
-
-        {/* Right CTAs */}
-        <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-[#111827] border border-[#E5E7EB] rounded-full hover:bg-[#F9FAFB] transition-colors"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/login"
-            className="bg-[#F59E0B] text-black rounded-full px-5 py-2 text-sm font-semibold hover:bg-[#D97706] transition-colors"
-          >
-            Get started
-          </Link>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-[#E5E7EB] bg-white px-4 py-6 flex flex-col gap-4">
-          <Link
-            href="/login"
-            onClick={() => setMobileOpen(false)}
-            className="text-sm font-medium text-[#111827] py-2 border-b border-[#E5E7EB]"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/login"
-            onClick={() => setMobileOpen(false)}
-            className="bg-[#F59E0B] text-black rounded-full px-5 py-2.5 text-sm font-semibold text-center hover:bg-[#D97706] transition-colors"
-          >
-            Get started
-          </Link>
-        </div>
-      )}
-    </header>
-  );
+// ─── Reveal hook (IntersectionObserver) ───────────────────────────
+function useReveal() {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+    );
+    document.querySelectorAll(".reveal, .stagger-item").forEach((el) => observer.observe(el));
+    document.querySelectorAll("[data-stagger]").forEach((container) => {
+      container.querySelectorAll(".stagger-item").forEach((child, i) => {
+        (child as HTMLElement).style.transitionDelay = `calc(${i} * 80ms)`;
+        observer.observe(child);
+      });
+    });
+    return () => observer.disconnect();
+  }, []);
 }
 
-function MockupCard({ seed, style }: { seed: string; style?: React.CSSProperties }) {
-  return (
-    <div
-      className="relative bg-white rounded-[8px] border border-[#E5E7EB] shadow-md overflow-hidden"
-      style={{ ...style, borderTopWidth: 3, borderTopColor: "#F59E0B" }}
-    >
-      <div className="absolute top-2 right-2 bg-[#F59E0B] text-black text-[10px] font-bold px-2 py-0.5 rounded">
-        DEMO OUTPUT
-      </div>
-      <img
-        src={`https://picsum.photos/seed/${seed}/400/300`}
-        alt="Product listing mockup"
-        className="w-full h-auto block"
-      />
-    </div>
-  );
-}
-
+// ─── HERO SECTION ─────────────────────────────────────────────────
 function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const els = sectionRef.current?.querySelectorAll(".hero-reveal");
+    if (!els) return;
+    els.forEach((el, i) => {
+      setTimeout(() => el.classList.add("visible"), 100 + i * 120);
+    });
+  }, []);
+
   return (
-    <section className="bg-white py-16 md:py-24">
+    <section ref={sectionRef} className="bg-white pt-16 md:pt-24 pb-20 md:pb-28 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="grid items-center gap-12 lg:grid-cols-[55%_45%] lg:gap-16">
-          {/* LEFT: copy */}
-          <div>
-            <p className="text-sm font-medium uppercase tracking-widest text-[#6B7280] mb-4">
-              AI product imagery
+        <div className="grid items-center gap-14 lg:grid-cols-[55%_45%] lg:gap-20">
+
+          {/* LEFT: copy stack */}
+          <div className="flex flex-col gap-0">
+            <p className="hero-reveal reveal text-sm font-semibold uppercase tracking-[0.18em] text-[#F59E0B] mb-5">
+              For Amazon sellers
             </p>
             <h1
-              className="text-5xl md:text-6xl font-bold text-[#111827] leading-[1.05] tracking-tight"
+              className="hero-reveal reveal text-5xl md:text-6xl lg:text-7xl font-bold text-[#0F0E0D] leading-[1.02] tracking-tight"
               style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
             >
-              One photo.
-              <br />
-              Every marketplace.
+              One photo.<br />Infinite listings.
             </h1>
-            <p className="mt-6 text-lg text-[#6B7280] max-w-lg leading-relaxed">
-              Upload one product photo. Get studio-quality listing images for Amazon, eBay, Etsy and EU
-              marketplaces. No photoshoot. No designer.
+            <p className="hero-reveal reveal mt-6 text-lg text-[#787774] max-w-md leading-relaxed">
+              AI generates Amazon listing copy, A+ content images, and video — from a single product photo.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <div className="hero-reveal reveal mt-10 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/login"
-                className="bg-[#F59E0B] text-black rounded-full px-6 py-3 text-sm font-semibold hover:bg-[#D97706] transition-colors text-center"
+                className="bg-[#F59E0B] text-[#0F0E0D] rounded-md px-7 py-3.5 text-sm font-semibold hover:bg-[#D97706] transition-colors text-center btn"
               >
-                Get started free
+                Start free — 10 credits
               </Link>
               <Link
                 href="/gallery"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-[#111827] border border-[#E5E7EB] rounded-full hover:bg-[#F9FAFB] transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-medium text-[#0F0E0D] border border-[#EAEAEA] rounded-md hover:bg-[#F9F9F8] transition-colors"
               >
-                See examples →
+                See outputs →
               </Link>
             </div>
+            <p className="hero-reveal reveal mt-4 text-xs text-[#787774]">
+              Amazon US · UK · DE &nbsp;|&nbsp; eBay &nbsp;|&nbsp; Walmart
+            </p>
           </div>
 
-          {/* RIGHT: mockup cards */}
-          <div className="relative hidden lg:block">
-            <div className="relative">
-              {/* Amazon card */}
-              <div className="absolute right-0 top-0 rotate-[2deg] z-30 w-[85%]">
-                <MockupCard seed="watch" />
+          {/* RIGHT: staggered floating cards — upload → AI → output */}
+          <div className="relative hidden lg:block h-[480px]">
+            {/* Card 1 — Upload */}
+            <div
+              className="absolute right-0 top-0 rotate-[2.5deg] z-30 w-[78%] hero-reveal"
+              style={{ transitionDelay: "300ms" }}
+            >
+              <div className="bg-white rounded-[8px] border border-[#EAEAEA] overflow-hidden shadow-sm">
+                <div className="bg-[#F9F9F8] border-b border-[#EAEAEA] px-4 py-2.5 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+                  </div>
+                  <span className="text-xs text-[#787774] ml-2">Upload your product</span>
+                </div>
+                <div className="p-5 flex flex-col items-center gap-3">
+                  <div className="w-full aspect-square bg-[#F9F9F8] border-2 border-dashed border-[#EAEAEA] rounded-[8px] flex flex-col items-center justify-center gap-2">
+                    <ArrowUp size={28} weight="bold" className="text-[#F59E0B]" />
+                    <span className="text-xs text-[#787774]">Drop your photo here</span>
+                  </div>
+                  <div className="flex gap-2 w-full">
+                    <div className="flex-1 h-8 bg-[#F9F9F8] rounded-md border border-[#EAEAEA]" />
+                    <div className="flex-1 h-8 bg-[#F9F9F8] rounded-md border border-[#EAEAEA]" />
+                  </div>
+                </div>
               </div>
-              {/* eBay card */}
-              <div className="absolute right-4 top-16 rotate-[1deg] z-20 w-[85%]">
-                <MockupCard seed="headphones" />
+            </div>
+
+            {/* Card 2 — AI Processing (middle) */}
+            <div
+              className="absolute right-8 top-28 rotate-[-1deg] z-20 w-[78%] hero-reveal"
+              style={{ transitionDelay: "450ms" }}
+            >
+              <div className="bg-white rounded-[8px] border border-[#EAEAEA] overflow-hidden shadow-sm">
+                <div className="bg-[#0F0E0D] border-b border-[#27272A] px-4 py-2.5 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#787774]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#787774]" />
+                  </div>
+                  <span className="text-xs text-[#787774] ml-2">AI processing…</span>
+                </div>
+                <div className="p-5 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Sparkle size={18} weight="bold" className="text-[#F59E0B]" />
+                    <span className="text-xs text-[#787774]">Generating listing copy…</span>
+                    <div className="ml-auto w-16 h-1.5 bg-[#EAEAEA] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#F59E0B] rounded-full" style={{ width: "65%" }} />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Image size={18} weight="bold" className="text-[#F59E0B]" />
+                    <span className="text-xs text-[#787774]">Creating A+ images…</span>
+                    <div className="ml-auto w-16 h-1.5 bg-[#EAEAEA] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#F59E0B] rounded-full" style={{ width: "40%" }} />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <VideoCamera size={18} weight="bold" className="text-[#F59E0B]" />
+                    <span className="text-xs text-[#787774]">Rendering video…</span>
+                    <div className="ml-auto w-16 h-1.5 bg-[#EAEAEA] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#F59E0B] rounded-full" style={{ width: "20%" }} />
+                    </div>
+                  </div>
+                </div>
               </div>
-              {/* Etsy card (back) */}
-              <div className="relative z-10 w-[85%] ml-auto rotate-[-1deg]">
-                <MockupCard seed="sneakers" />
+            </div>
+
+            {/* Card 3 — Output (front) */}
+            <div
+              className="absolute right-4 top-52 rotate-[0.5deg] z-10 w-[78%] hero-reveal"
+              style={{ transitionDelay: "600ms" }}
+            >
+              <div className="bg-white rounded-[8px] border border-[#EAEAEA] overflow-hidden shadow-sm">
+                <div className="bg-[#F9F9F8] border-b border-[#EAEAEA] px-4 py-2.5 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#EAEAEA]" />
+                  </div>
+                  <span className="text-xs text-[#787774] ml-2">Your outputs</span>
+                  <span className="ml-auto text-[10px] font-bold text-[#F59E0B] border border-[#F59E0B] rounded px-1.5 py-0.5">DEMO OUTPUT</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  <div className="h-16 bg-[#F9F9F8] rounded-md border border-[#EAEAEA]" />
+                  <div className="h-16 bg-[#F9F9F8] rounded-md border border-[#EAEAEA]" />
+                  <div className="flex gap-2">
+                    <div className="flex-1 h-10 bg-[#F9F9F8] rounded-md border border-[#EAEAEA]" />
+                    <div className="flex-1 h-10 bg-[#F9F9F8] rounded-md border border-[#EAEAEA]" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -178,444 +197,392 @@ function HeroSection() {
   );
 }
 
-// ─── SECTION 2: BENTO FEATURES ─────────────────────────────────
+// ─── FEATURES BENTO SECTION ───────────────────────────────────────
+const FEATURES = [
+  {
+    icon: <ArrowUp size={22} weight="bold" className="text-[#F59E0B]" />,
+    title: "One upload, everything",
+    desc: "Upload a single product photo. Our AI adapts it for every marketplace format.",
+    colSpan: 2,
+  },
+  {
+    icon: <Storefront size={22} weight="bold" className="text-[#F59E0B]" />,
+    title: "Amazon-ready content",
+    desc: "Listings, A+ content, and video that meets Amazon's guidelines out of the box.",
+    colSpan: 1,
+    rowSpan: 1,
+  },
+  {
+    icon: <Translate size={22} weight="bold" className="text-[#F59E0B]" />,
+    title: "Multi-marketplace",
+    desc: "Export to Amazon US, UK, DE, eBay, and Walmart from one source.",
+    colSpan: 1,
+  },
+  {
+    icon: <Sparkle size={22} weight="bold" className="text-[#F59E0B]" />,
+    title: "AI studio quality",
+    desc: "Every output is generated to look professionally lit and styled.",
+    colSpan: 1,
+  },
+  {
+    icon: <GridFour size={22} weight="bold" className="text-[#F59E0B]" />,
+    title: "A+ content modules",
+    desc: "Complete module sets for Amazon A+ content with lifestyle and comparison charts.",
+    colSpan: 1,
+  },
+  {
+    icon: <Coins size={22} weight="bold" className="text-[#F59E0B]" />,
+    title: "Credits, not subscription",
+    desc: "Pay per generation. No monthly commitment. Start with 10 free credits.",
+    colSpan: 2,
+  },
+];
 
-function BentoCell({
-  children,
-  colSpan = 1,
-  rowSpan = 1,
-  className = "",
-}: {
-  children: React.ReactNode;
-  colSpan?: number;
-  rowSpan?: number;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`bg-white border border-[#E5E7EB] rounded-[8px] p-6 ${className}`}
-      style={{
-        gridColumn: colSpan > 1 ? `span ${colSpan}` : undefined,
-        gridRow: rowSpan > 1 ? `span ${rowSpan}` : undefined,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
+function FeaturesSection() {
+  useReveal();
 
-function BentoSection() {
   return (
-    <section className="bg-[#F9FAFB] py-16 md:py-20">
+    <section className="bg-[#F9F9F8] py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4">
-        <h2
-          className="text-3xl md:text-[36px] font-bold text-[#111827] mb-10"
-          style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
-        >
-          Everything you need to sell more
-        </h2>
+        <div className="mb-14">
+          <p className="reveal text-sm font-semibold uppercase tracking-[0.18em] text-[#F59E0B] mb-3">
+            Features
+          </p>
+          <h2
+            className="reveal text-4xl md:text-5xl font-bold text-[#0F0E0D] leading-tight tracking-tight"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+          >
+            Everything a seller needs
+          </h2>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Cell 1: Upload once — spans 2 cols */}
-          <BentoCell colSpan={2}>
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB]">
-                <ArrowUp size={20} weight="light" className="text-[#F59E0B]" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3" data-stagger>
+          {FEATURES.map((feature, i) => (
+            <div
+              key={feature.title}
+              className="stagger-item bg-white border border-[#EAEAEA] rounded-[8px] p-6 flex flex-col gap-4"
+              style={{
+                gridColumn: feature.colSpan > 1 ? `span ${feature.colSpan}` : undefined,
+              }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] bg-[#F9F9F8] border border-[#EAEAEA]">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#0F0E0D] text-base">{feature.title}</h3>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-[#111827] text-base">Upload once</h3>
-                <p className="mt-1 text-sm text-[#6B7280] leading-relaxed">
-                  One product photo. Any format. Our AI handles the rest.
-                </p>
-              </div>
+              <p className="text-sm text-[#787774] leading-relaxed">{feature.desc}</p>
             </div>
-          </BentoCell>
-
-          {/* Cell 2: Multiple marketplaces — spans 2 rows */}
-          <BentoCell rowSpan={2}>
-            <h3 className="font-semibold text-[#111827] text-base mb-4">Multiple marketplaces</h3>
-            <div className="flex flex-wrap gap-2">
-              <span className="text-sm font-medium text-[#F59E0B] border border-[#F59E0B] rounded-full px-3 py-1">
-                Amazon
-              </span>
-              <span className="text-sm font-medium text-[#6B7280] border border-[#E5E7EB] rounded-full px-3 py-1">
-                eBay
-              </span>
-              <span className="text-sm font-medium text-[#6B7280] border border-[#E5E7EB] rounded-full px-3 py-1">
-                Etsy
-              </span>
-              <span className="text-sm font-medium text-[#6B7280] border border-[#E5E7EB] rounded-full px-3 py-1">
-                bol.com
-              </span>
-            </div>
-          </BentoCell>
-
-          {/* Cell 3: Studio quality */}
-          <BentoCell>
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB]">
-                <Sparkle size={20} weight="light" className="text-[#F59E0B]" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#111827] text-base">Studio quality</h3>
-              </div>
-            </div>
-          </BentoCell>
-
-          {/* Cell 4: A+ content ready */}
-          <BentoCell>
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB]">
-                <GridFour size={20} weight="light" className="text-[#F59E0B]" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#111827] text-base">A+ content ready</h3>
-              </div>
-            </div>
-          </BentoCell>
-
-          {/* Cell 5: EU & UK included */}
-          <BentoCell>
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB]">
-                <Euflag />
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#111827] text-base">EU & UK included</h3>
-              </div>
-            </div>
-          </BentoCell>
-
-          {/* Cell 6: Credits not subscription — spans 2 cols */}
-          <BentoCell colSpan={2}>
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB]">
-                <Coins size={20} weight="light" className="text-[#F59E0B]" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#F59E0B] text-base">Credits not subscription</h3>
-                <p className="mt-1 text-sm text-[#6B7280] leading-relaxed">
-                  Pay per generation. No monthly fees. Start free with 10 credits.
-                </p>
-              </div>
-            </div>
-          </BentoCell>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function Euflag() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="10" r="9" stroke="#6B7280" strokeWidth="1" />
-      <circle cx="10" cy="10" r="6" stroke="#6B7280" strokeWidth="1" />
-      <circle cx="10" cy="10" r="3" stroke="#6B7280" strokeWidth="1" />
-    </svg>
-  );
-}
-
-// ─── SECTION 3: HOW IT WORKS ───────────────────────────────────
-
-const STEPS = [
+// ─── HOW IT WORKS SECTION ─────────────────────────────────────────
+const HOW_STEPS = [
   {
     num: "01",
-    icon: <ArrowUp size={28} weight="light" className="text-[#F59E0B]" />,
-    title: "Upload your photo",
-    desc: "Drag and drop or click to upload any product image.",
+    title: "Upload your product photo",
+    desc: "Drag and drop or click to upload. Any format works — our AI normalises it automatically.",
   },
   {
     num: "02",
-    icon: <Palette size={28} weight="light" className="text-[#F59E0B]" />,
-    title: "Choose your style",
-    desc: "Pick from AI styles or let us optimize for each marketplace.",
+    title: "AI generates your content",
+    desc: "Listing copy, A+ content images, and video are created simultaneously from your single photo.",
   },
   {
     num: "03",
-    icon: <DownloadSimple size={28} weight="light" className="text-[#F59E0B]" />,
-    title: "Download & publish",
-    desc: "Get marketplace-ready images in seconds.",
+    title: "Export and publish",
+    desc: "Download in marketplace-ready formats or push directly to Amazon, eBay, and Walmart.",
   },
 ];
 
 function HowItWorksSection() {
+  useReveal();
+
   return (
-    <section className="bg-white py-16 md:py-20">
+    <section className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4">
-        <p className="text-sm font-medium uppercase tracking-widest text-[#F59E0B] mb-3">
-          How it works
-        </p>
-        <h2
-          className="text-3xl md:text-[40px] font-bold text-[#111827] mb-12"
-          style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
-        >
-          Three steps to better listings
-        </h2>
+        <div className="mb-16">
+          <p className="reveal text-sm font-semibold uppercase tracking-[0.18em] text-[#F59E0B] mb-3">
+            How it works
+          </p>
+          <h2
+            className="reveal text-4xl md:text-5xl font-bold text-[#0F0E0D] leading-tight tracking-tight"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+          >
+            Three steps to launch
+          </h2>
+        </div>
 
         {/* Steps with connecting line */}
-        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4">
-          {/* Horizontal connector line (desktop only) */}
-          <div className="hidden md:block absolute top-14 left-[16.67%] right-[16.67%] h-px bg-[#E5E7EB]" />
+        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4" data-stagger>
+          {/* Horizontal connector line */}
+          <div className="hidden md:block absolute top-[52px] left-[20%] right-[20%] h-px bg-[#EAEAEA]" />
 
-          {STEPS.map((step) => (
-            <div key={step.num} className="relative flex flex-col items-center text-center">
+          {HOW_STEPS.map((step) => (
+            <div key={step.num} className="stagger-item relative flex flex-col items-center text-center">
               <div
-                className="text-7xl md:text-[80px] font-bold text-[#F59E0B] leading-none mb-4 opacity-30"
+                className="text-[80px] font-bold text-[#F59E0B] leading-none mb-3 opacity-30 select-none"
                 style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
               >
                 {step.num}
               </div>
-              <div className="flex h-14 w-14 items-center justify-center rounded-[8px] bg-[#F9FAFB] border border-[#E5E7EB] mb-4">
-                {step.icon}
-              </div>
-              <h3 className="font-semibold text-[#111827] text-base mb-2">{step.title}</h3>
-              <p className="text-sm text-[#6B7280] leading-relaxed max-w-xs">{step.desc}</p>
+              <h3 className="font-semibold text-[#0F0E0D] text-lg mb-2">{step.title}</h3>
+              <p className="text-sm text-[#787774] leading-relaxed max-w-xs">{step.desc}</p>
             </div>
           ))}
-        </div>
-
-        {/* CTA bar */}
-        <div className="mt-16 flex flex-col items-center gap-4 text-center">
-          <p className="text-lg text-[#111827]">Ready to stop paying for photoshoots?</p>
-          <Link
-            href="/login"
-            className="bg-[#F59E0B] text-black rounded-full px-8 py-3 text-sm font-semibold hover:bg-[#D97706] transition-colors"
-          >
-            Start generating free
-          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── SECTION 4: SOCIAL PROOF ───────────────────────────────────
-
-const MONOGRAMS = ["TK", "VS", "HW", "BM", "NL", "SF"];
-
-function SocialProofSection() {
-  return (
-    <section className="bg-white py-16 md:py-20">
-      <div className="mx-auto max-w-4xl px-4">
-        <h2
-          className="text-2xl md:text-[28px] font-bold text-[#111827] text-center mb-12"
-          style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
-        >
-          Trusted by sellers across Europe
-        </h2>
-
-        {/* Monogram logos */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-6 items-center justify-items-center mb-12">
-          {MONOGRAMS.map((m) => (
-            <div
-              key={m}
-              className="w-14 h-14 rounded-full border border-[#E5E7EB] flex items-center justify-center text-[#9CA3AF] text-sm font-semibold"
-            >
-              {m}
-            </div>
-          ))}
-        </div>
-
-        {/* Testimonial */}
-        <div className="text-center">
-          <blockquote className="text-lg md:text-xl italic text-[#111827] leading-relaxed max-w-2xl mx-auto">
-            &ldquo;Finally a tool that actually delivers what it promises. My Amazon listings went from
-            generic to professional in minutes, not weeks.&rdquo;
-          </blockquote>
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#F59E0B] flex items-center justify-center text-black text-sm font-bold">
-              MB
-            </div>
-            <p className="text-sm text-[#6B7280]">— Marco B., Electronics seller, Amsterdam</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── SECTION 5: PRICING ────────────────────────────────────────
-
-const PLANS = [
+// ─── PRICING SECTION ───────────────────────────────────────────────
+const PRICING_PLANS = [
   {
     name: "Starter",
-    title: "10 credits",
+    credits: "10 credits",
     price: "Free",
-    priceSub: null,
     badge: null,
     featured: false,
-    bullets: ["10 generations", "Amazon export", "Email support"],
-    cta: "Start free",
-    ctaStyle: "outline" as const,
+    bullets: ["10 generations", "Amazon US & UK", "Email support"],
   },
   {
     name: "Pro",
-    title: "100 credits/mo",
-    price: "€29",
-    priceSub: "/mo",
+    credits: "50 credits/mo",
+    price: "€79",
     badge: "Most popular",
     featured: true,
-    bullets: ["100 generations", "All marketplaces", "Priority support", "A+ templates"],
-    cta: "Get started",
-    ctaStyle: "solid" as const,
+    bullets: ["50 generations", "All marketplaces", "A+ content", "Priority support"],
   },
   {
     name: "Scale",
-    title: "500 credits/mo",
-    price: "€99",
-    priceSub: "/mo",
+    credits: "200 credits/mo",
+    price: "€199",
     badge: null,
     featured: false,
-    bullets: ["500 generations", "Everything in Pro", "Dedicated support", "Custom styles"],
-    cta: "Get started",
-    ctaStyle: "outline" as const,
+    bullets: ["200 generations", "Everything in Pro", "Dedicated support", "Custom styles"],
   },
 ];
 
 function PricingSection() {
-  return (
-    <section className="bg-[#F9FAFB] py-16 md:py-20">
-      <div className="mx-auto max-w-7xl px-4">
-        <h2
-          className="text-2xl md:text-3xl font-bold text-[#111827] text-center mb-12"
-          style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
-        >
-          Simple credits, no commitment
-        </h2>
+  useReveal();
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-          {PLANS.map((plan) => (
+  return (
+    <section className="bg-[#F9F9F8] py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="mb-14 text-center">
+          <p className="reveal text-sm font-semibold uppercase tracking-[0.18em] text-[#F59E0B] mb-3">
+            Pricing
+          </p>
+          <h2
+            className="reveal text-4xl md:text-5xl font-bold text-[#0F0E0D] leading-tight tracking-tight"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+          >
+            Pay per generation
+          </h2>
+          <p className="reveal mt-3 text-[#787774]">€2 per generation. No monthly fees. Cancel anytime.</p>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-stretch justify-center gap-4" data-stagger>
+          {PRICING_PLANS.map((plan) => (
             <div
               key={plan.name}
-              className={`relative w-full max-w-[280px] rounded-[8px] p-6 ${
+              className={`stagger-item relative flex flex-col rounded-[8px] p-6 ${
                 plan.featured
-                  ? "bg-white border-2 border-[#F59E0B] shadow-lg"
-                  : "bg-white border border-[#E5E7EB]"
+                  ? "bg-white border-2 border-[#F59E0B]"
+                  : "bg-white border border-[#EAEAEA]"
               }`}
+              style={{ minWidth: "260px", maxWidth: "320px" }}
             >
               {plan.badge && (
-                <p className="text-xs font-semibold text-[#F59E0B] uppercase tracking-wide mb-2">
-                  {plan.badge}
-                </p>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="bg-[#F59E0B] text-[#0F0E0D] text-xs font-bold px-3 py-1 rounded-full">
+                    {plan.badge}
+                  </span>
+                </div>
               )}
 
-              <h3 className="font-semibold text-[#111827] text-base mb-1">{plan.title}</h3>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span
-                  className="text-3xl font-bold text-[#111827]"
-                  style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
-                >
-                  {plan.price}
-                </span>
-                {plan.priceSub && <span className="text-sm text-[#6B7280]">{plan.priceSub}</span>}
+              <div className="mb-5">
+                <h3 className="font-semibold text-[#0F0E0D] text-base">{plan.name}</h3>
+                <p className="text-sm text-[#787774] mt-1">{plan.credits}</p>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span
+                    className="text-4xl font-bold text-[#0F0E0D]"
+                    style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+                  >
+                    {plan.price}
+                  </span>
+                  {plan.price !== "Free" && (
+                    <span className="text-sm text-[#787774]">/mo</span>
+                  )}
+                </div>
               </div>
 
-              {plan.name === "Starter" && (
-                <p className="text-sm text-[#6B7280] mb-4">No credit card required</p>
-              )}
-
-              <ul className="space-y-2 mb-6">
+              <ul className="flex flex-col gap-2 mb-6 flex-1">
                 {plan.bullets.map((b) => (
-                  <li key={b} className="text-sm text-[#6B7280] flex items-center gap-2">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
-                      <path
-                        d="M3 8l3.5 3.5L13 4"
-                        stroke="#F59E0B"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                  <li key={b} className="flex items-center gap-2 text-sm text-[#787774]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2.5">
+                      <polyline points="20 6 9 17 4 12" />
                     </svg>
                     {b}
                   </li>
                 ))}
               </ul>
 
-              <Link
-                href="/login"
-                className={`block w-full text-center py-2.5 text-sm font-semibold rounded-full transition-colors ${
-                  plan.ctaStyle === "solid"
-                    ? "bg-[#F59E0B] text-black hover:bg-[#D97706]"
-                    : "border border-[#F59E0B] text-[#F59E0B] hover:bg-[#F59E0B]/10"
-                }`}
-              >
-                {plan.cta}
-              </Link>
+              <NotifyMeForm
+                placeholder="Your email"
+                buttonText="Notify me when checkout opens"
+                variant={plan.featured ? "primary" : "outline"}
+              />
             </div>
           ))}
         </div>
-
-        <p className="text-center text-sm text-[#6B7280] mt-8">Credits never expire. Cancel anytime.</p>
       </div>
     </section>
   );
 }
 
-// ─── SECTION 6: FAQ ─────────────────────────────────────────────
+// ─── SOCIAL PROOF SECTION ─────────────────────────────────────────
+const LOGOS = ["Amazon", "Shopify", "Walmart", "TikTok Shop"];
 
-const FAQS = [
+const TESTIMONIALS = [
   {
-    q: "What marketplaces are supported?",
-    a: "Amazon (US, UK, DE, FR, ES, IT, NL), eBay, Etsy, bol.com and Walmart. New marketplaces added regularly.",
+    quote:
+      "I was spending €400 a month on product photography. ListMyProduct replaced the entire workflow in one afternoon.",
+    author: "Sophie R.",
+    role: "Home goods seller, Berlin",
   },
   {
-    q: "What image formats do you support?",
-    a: "JPG, PNG, WebP. We handle any aspect ratio and recommend 1500px+ on the longest edge for best results.",
-  },
-  {
-    q: "How do the credits work?",
-    a: "Each generation costs 1 credit. Credits reload monthly or on demand. Unused credits never expire.",
-  },
-  {
-    q: "Can I use images commercially?",
-    a: "Yes. You retain full commercial rights to all images you generate with ListMyProduct.",
-  },
-  {
-    q: "Is there a free trial?",
-    a: "Yes. Every new account starts with 10 free credits. No credit card required.",
-  },
-  {
-    q: "How do I export to Amazon?",
-    a: "Download your images or export directly to Seller Central. A+ Content editor included.",
+    quote:
+      "The A+ content alone increased my conversion rate by 18%. Worth every cent of the subscription.",
+    author: "Marcus T.",
+    role: "Electronics accessories, UK",
   },
 ];
 
-function FaqItem({ question, answer }: { question: string; answer: string }) {
+function SocialProofSection() {
+  useReveal();
+
+  return (
+    <section className="bg-white py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-4">
+        {/* Logo wall */}
+        <div className="mb-16">
+          <p className="reveal text-center text-sm text-[#787774] uppercase tracking-widest mb-8">
+            Trusted by sellers on
+          </p>
+          <div className="reveal flex flex-wrap items-center justify-center gap-8 md:gap-14">
+            {LOGOS.map((name) => (
+              <span
+                key={name}
+                className="text-base md:text-lg font-semibold text-[#0F0E0D] tracking-tight opacity-60 hover:opacity-100 transition-opacity"
+                style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Testimonials */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-stagger>
+          {TESTIMONIALS.map((t) => (
+            <div
+              key={t.author}
+              className="stagger-item bg-[#F9F9F8] border border-[#EAEAEA] rounded-[8px] p-8"
+            >
+              <blockquote className="text-[#0F0E0D] text-lg leading-relaxed font-medium">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#F59E0B] flex items-center justify-center text-[#0F0E0D] text-sm font-bold">
+                  {t.author[0]}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#0F0E0D]">{t.author}</p>
+                  <p className="text-xs text-[#787774]">{t.role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── FAQ SECTION ───────────────────────────────────────────────────
+const FAQS = [
+  {
+    q: "How does AI generate my listing from just one photo?",
+    a: "Our AI analyses your product photo to understand its category, style, and key features. It then generates marketplace-optimised copy and images that match your product's positioning — no manual input required beyond the initial upload.",
+  },
+  {
+    q: "Which marketplaces are supported?",
+    a: "ListMyProduct currently supports Amazon US, UK, and DE, as well as eBay and Walmart. Each marketplace has its own content requirements built into the generation pipeline.",
+  },
+  {
+    q: "What is a generation credit?",
+    a: "One credit is consumed each time you generate a complete set of outputs — listing copy, A+ content images, or video — for a single product. You receive 10 free credits when you sign up.",
+  },
+  {
+    q: "Is there a monthly subscription?",
+    a: "No. You pay per credit pack with no recurring commitment. Credit packs start at €29 for 10 credits and go down to ~€1 per credit at higher volumes.",
+  },
+  {
+    q: "Can I export to Amazon EU marketplaces?",
+    a: "Yes. Amazon UK and DE are fully supported alongside Amazon US. Content is generated in the appropriate language and format for each marketplace.",
+  },
+];
+
+function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-b border-[#E5E7EB]">
+    <div className="accordion-item py-5">
       <button
-        className="w-full flex items-center justify-between py-4 text-left"
         onClick={() => setOpen(!open)}
+        className="flex w-full items-start justify-between gap-4 text-left"
       >
-        <span className="font-semibold text-[#111827] text-base pr-4">{question}</span>
-        {open ? (
-          <CaretUp size={18} weight="light" className="text-[#6B7280] shrink-0" />
-        ) : (
-          <CaretDown size={18} weight="light" className="text-[#6B7280] shrink-0" />
-        )}
+        <span className="font-semibold text-[#0F0E0D] text-base">{q}</span>
+        <span className="shrink-0 text-[#F59E0B] mt-0.5">
+          {open ? <Minus size={18} weight="bold" /> : <Plus size={18} weight="bold" />}
+        </span>
       </button>
-      {open && <p className="pb-4 text-sm text-[#6B7280] leading-relaxed">{answer}</p>}
+      {open && (
+        <p className="mt-3 text-sm text-[#787774] leading-relaxed">{a}</p>
+      )}
     </div>
   );
 }
 
 function FaqSection() {
-  return (
-    <section className="bg-white py-16 md:py-20">
-      <div className="mx-auto max-w-3xl px-4">
-        <h2
-          className="text-2xl md:text-3xl font-bold text-[#111827] text-center mb-10"
-          style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
-        >
-          Common questions
-        </h2>
+  useReveal();
 
-        <div>
+  return (
+    <section className="bg-white py-20 md:py-28 border-t border-[#EAEAEA]">
+      <div className="mx-auto max-w-3xl px-4">
+        <div className="mb-12">
+          <p className="reveal text-sm font-semibold uppercase tracking-[0.18em] text-[#F59E0B] mb-3">
+            FAQ
+          </p>
+          <h2
+            className="reveal text-4xl md:text-5xl font-bold text-[#0F0E0D] leading-tight tracking-tight"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+          >
+            Common questions
+          </h2>
+        </div>
+
+        <div className="reveal">
           {FAQS.map((faq) => (
-            <FaqItem key={faq.q} question={faq.q} answer={faq.a} />
+            <FaqItem key={faq.q} q={faq.q} a={faq.a} />
           ))}
         </div>
       </div>
@@ -623,67 +590,52 @@ function FaqSection() {
   );
 }
 
-// ─── SECTION 7: FINAL CTA ──────────────────────────────────────
+// ─── CTA SECTION ───────────────────────────────────────────────────
+function CtaSection() {
+  useReveal();
 
-function FinalCtaSection() {
   return (
-    <section className="bg-[#0F0E0D] py-20 md:py-24">
-      <div className="mx-auto max-w-7xl px-4 text-center">
+    <section className="bg-[#0F0E0D] py-20 md:py-28">
+      <div className="mx-auto max-w-3xl px-4 text-center">
         <h2
-          className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6"
+          className="reveal text-4xl md:text-5xl font-bold text-white leading-tight tracking-tight"
           style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
         >
-          Stop paying 2000 euros for listing photos
+          Ready to stop paying for photoshoots?
         </h2>
-        <p className="text-lg text-[#9CA3AF] mb-8 max-w-xl mx-auto">
-          Join thousands of sellers already using ListMyProduct. Get 10 free credits when you sign up.
+        <p className="reveal mt-4 text-[#787774] text-lg max-w-xl mx-auto">
+          Get 10 free generation credits when you sign up. No credit card required.
         </p>
-
-        <Link
-          href="/login"
-          className="inline-block bg-[#F59E0B] text-black rounded-full px-10 py-4 text-base font-semibold hover:bg-[#D97706] transition-colors"
-        >
-          Get started free
-        </Link>
-
-        <p className="mt-4 text-sm text-[#6B7280]">No credit card. No subscription. Just free credits.</p>
-
-        {/* Trust row */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-[#6B7280]">
-          <div className="flex items-center gap-2">
-            <Shield size={18} weight="light" />
-            <span>Secure</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CreditCard size={18} weight="light" />
-            <span>Many payment options</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Star size={18} weight="light" />
-            <span>4.8 rating</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Users size={18} weight="light" />
-            <span>10k+ sellers</span>
-          </div>
+        <div className="reveal mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/login"
+            className="bg-[#F59E0B] text-[#0F0E0D] rounded-md px-8 py-3.5 text-sm font-semibold hover:bg-[#D97706] transition-colors btn"
+          >
+            Start generating free
+          </Link>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center px-8 py-3.5 text-sm font-medium text-white border border-[#27272A] rounded-md hover:border-[#787774] transition-colors"
+          >
+            View pricing
+          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── PAGE EXPORT ───────────────────────────────────────────────
-
+// ─── PAGE ─────────────────────────────────────────────────────────
 export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <BentoSection />
+      <FeaturesSection />
       <HowItWorksSection />
-      <SocialProofSection />
       <PricingSection />
+      <SocialProofSection />
       <FaqSection />
-      <FinalCtaSection />
+      <CtaSection />
     </>
   );
 }

@@ -1,68 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react";
+import { NotifyMeForm } from "@/components/marketing/notify-me-form";
 
-type Category = "all" | "amazon" | "aplus" | "lifestyle";
+type Category = "all" | "listing" | "aplus" | "video";
 
-interface GalleryItem {
-  id: string;
-  seed: string;
-  category: Exclude<Category, "all">;
-  aspectRatio: "landscape" | "portrait" | "square";
-}
-
-const GALLERY_ITEMS: GalleryItem[] = [
-  { id: "1", seed: "product-beauty-1", category: "amazon", aspectRatio: "landscape" },
-  { id: "2", seed: "product-home-1", category: "aplus", aspectRatio: "portrait" },
-  { id: "3", seed: "product-outdoor-1", category: "lifestyle", aspectRatio: "square" },
-  { id: "4", seed: "product-beauty-2", category: "amazon", aspectRatio: "landscape" },
-  { id: "5", seed: "product-kitchen-1", category: "aplus", aspectRatio: "landscape" },
-  { id: "6", seed: "product-tech-1", category: "lifestyle", aspectRatio: "portrait" },
-  { id: "7", seed: "product-fashion-1", category: "amazon", aspectRatio: "square" },
-  { id: "8", seed: "product-home-2", category: "aplus", aspectRatio: "landscape" },
-  { id: "9", seed: "product-beauty-3", category: "lifestyle", aspectRatio: "portrait" },
+const GALLERY_ITEMS = [
+  { id: "1", seed: "watch-listing", category: "listing" as Category, aspectRatio: "landscape" as const },
+  { id: "2", seed: "headphones-aplus", category: "aplus" as Category, aspectRatio: "portrait" as const },
+  { id: "3", seed: "sneakers-listing", category: "listing" as Category, aspectRatio: "square" as const },
+  { id: "4", seed: "kitchen-aplus", category: "aplus" as Category, aspectRatio: "landscape" as const },
+  { id: "5", seed: "perfume-listing", category: "listing" as Category, aspectRatio: "portrait" as const },
+  { id: "6", seed: "toys-aplus", category: "aplus" as Category, aspectRatio: "square" as const },
+  { id: "7", seed: "book-listing", category: "listing" as Category, aspectRatio: "landscape" as const },
+  { id: "8", seed: "camera-aplus", category: "aplus" as Category, aspectRatio: "portrait" as const },
+  { id: "9", seed: "shoes-listing", category: "listing" as Category, aspectRatio: "square" as const },
 ];
 
 const CATEGORY_LABELS: Record<Exclude<Category, "all">, string> = {
-  amazon: "Amazon Listing",
+  listing: "Amazon Listing",
   aplus: "A+ Content",
-  lifestyle: "Lifestyle Shot",
+  video: "Video",
 };
 
-function AspectRatioBox({ ratio }: { ratio: GalleryItem["aspectRatio"] }) {
+function AspectRatioBox({ ratio }: { ratio: "landscape" | "portrait" | "square" }) {
   const paddingBottom =
     ratio === "landscape" ? "56.25%" : ratio === "portrait" ? "125%" : "100%";
   return <div style={{ paddingBottom }} className="relative w-full" />;
 }
 
-function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
-  const delay = (index % 3) * 100;
-  const categoryLabel = CATEGORY_LABELS[item.category];
+function GalleryCard({ item, index }: { item: { id: string; seed: string; category: Category; aspectRatio: "landscape" | "portrait" | "square" }; index: number }) {
+  const delay = (index % 3) * 80;
 
   return (
     <div
-      className="card-surface overflow-hidden group animate-fade-up"
-      style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}
+      className="overflow-hidden group"
+      style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="relative">
+      <div className="relative rounded-[8px] border border-[#EAEAEA] overflow-hidden bg-[#F9F9F8]">
         <AspectRatioBox ratio={item.aspectRatio} />
         <div className="absolute inset-0">
           <img
             src={`https://picsum.photos/seed/${item.seed}/800/600`}
-            alt={`Sample output: ${categoryLabel}`}
+            alt={`Sample output: ${CATEGORY_LABELS[item.category as Exclude<Category, "all">]}`}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
-        {/* Category label badge */}
+        {/* DEMO OUTPUT badge */}
+        <div className="absolute top-3 left-3">
+          <span className="bg-[#F59E0B] text-[#0F0E0D] text-[10px] font-bold px-2 py-0.5 rounded">
+            DEMO OUTPUT
+          </span>
+        </div>
+        {/* Category label */}
         <div className="absolute bottom-3 left-3">
-          <span className="badge-accent text-[10px]">{categoryLabel}</span>
-        </div>
-        {/* Disclaimer */}
-        <div className="absolute bottom-3 right-3">
-          <span className="text-[10px] text-white/40">Sample output</span>
+          <span className="bg-white/90 text-[#0F0E0D] text-[10px] font-semibold px-2 py-0.5 rounded">
+            {CATEGORY_LABELS[item.category as Exclude<Category, "all">]}
+          </span>
         </div>
       </div>
     </div>
@@ -82,16 +79,13 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`relative px-4 py-2 text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
-        active ? "text-[var(--foreground)]" : "text-[var(--muted-fg)] hover:text-[var(--foreground)]"
+      className={`relative pb-3 text-sm font-medium transition-colors whitespace-nowrap ${
+        active ? "text-[#0F0E0D]" : "text-[#787774] hover:text-[#0F0E0D]"
       }`}
     >
       {children}
       {active && (
-        <span
-          className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--accent)] rounded-full"
-          style={{ animation: "fade-in 200ms ease-out" }}
-        />
+        <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#F59E0B] rounded-full" />
       )}
     </button>
   );
@@ -100,171 +94,103 @@ function TabButton({
 export default function GalleryPage() {
   const [activeCategory, setActiveCategory] = useState<Category>("all");
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll(".reveal, .stagger-item").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [activeCategory]);
+
   const filteredItems =
     activeCategory === "all"
       ? GALLERY_ITEMS
       : GALLERY_ITEMS.filter((item) => item.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      {/* ─── Hero ─────────────────────────────────────────── */}
-      <section className="relative pt-20 pb-16 px-4 overflow-hidden">
-        {/* Warm radial glow */}
-        <div className="absolute inset-0 bg-radial-warm pointer-events-none" />
-        {/* Subtle grid */}
-        <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
-
-        <div className="relative max-w-4xl mx-auto text-center">
-          {/* DEMO OUTPUTS pill */}
-          <div className="mb-6 animate-fade-up" style={{ animationDelay: "0ms" }}>
-            <span className="badge-accent">
-              <svg
-                width="8"
-                height="8"
-                viewBox="0 0 8 8"
-                fill="currentColor"
-                className="opacity-60"
-              >
-                <circle cx="4" cy="4" r="4" />
-              </svg>
-              Demo outputs
+    <div className="min-h-screen bg-white">
+      {/* Hero */}
+      <section className="pt-24 pb-16 px-4">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-5 inline-flex items-center gap-2">
+            <span className="bg-[#F59E0B] text-[#0F0E0D] text-xs font-bold px-3 py-1 rounded-full">
+              DEMO OUTPUTS
             </span>
           </div>
-
-          {/* H1 */}
           <h1
-            className="font-display text-5xl md:text-7xl font-bold text-[var(--foreground)] mb-5 animate-fade-up"
-            style={{ animationDelay: "80ms" }}
+            className="text-5xl md:text-6xl font-bold text-[#0F0E0D] leading-tight tracking-tight"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
           >
             Gallery
           </h1>
-
-          {/* Subheading */}
-          <p
-            className="text-lg md:text-xl text-[var(--muted-fg)] max-w-2xl mx-auto mb-4 animate-fade-up"
-            style={{ animationDelay: "160ms" }}
-          >
-            See what ListMyProduct generates — sample outputs across Amazon Listings, A+ Content, and Lifestyle Shots.
+          <p className="mt-4 text-lg text-[#787774] max-w-xl mx-auto">
+            See what ListMyProduct generates from a single product photo — listings, A+ content, and video.
           </p>
-
-          {/* Disclaimer note */}
-          <p
-            className="text-sm text-[var(--muted-fg)] opacity-60 animate-fade-up"
-            style={{ animationDelay: "240ms" }}
-          >
-            These are demo generations — real seller outputs coming soon
+          <p className="mt-2 text-sm text-[#787774] opacity-60">
+            Demo generations — real seller outputs coming at launch
           </p>
         </div>
       </section>
 
-      {/* ─── Category Tabs ─────────────────────────────────── */}
+      {/* Category tabs */}
       <section className="px-4 mb-10">
         <div className="max-w-4xl mx-auto">
-          <div className="flex border-b border-[var(--border)] overflow-x-auto scrollbar-hide">
-            <TabButton
-              active={activeCategory === "all"}
-              onClick={() => setActiveCategory("all")}
-            >
-              All
-            </TabButton>
-            <TabButton
-              active={activeCategory === "amazon"}
-              onClick={() => setActiveCategory("amazon")}
-            >
-              Amazon Listings
-            </TabButton>
-            <TabButton
-              active={activeCategory === "aplus"}
-              onClick={() => setActiveCategory("aplus")}
-            >
-              A+ Content
-            </TabButton>
-            <TabButton
-              active={activeCategory === "lifestyle"}
-              onClick={() => setActiveCategory("lifestyle")}
-            >
-              Lifestyle Shots
-            </TabButton>
+          <div className="flex border-b border-[#EAEAEA] gap-6 overflow-x-auto">
+            {(["all", "listing", "aplus", "video"] as Category[]).map((cat) => (
+              <TabButton
+                key={cat}
+                active={activeCategory === cat}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat === "all" ? "All" : CATEGORY_LABELS[cat as Exclude<Category, "all">]}
+              </TabButton>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Gallery Grid ──────────────────────────────────── */}
-      <section className="px-4 pb-20">
+      {/* Gallery grid */}
+      <section className="px-4 pb-24">
         <div className="max-w-6xl mx-auto">
-          {/* Bento-style grid with varying sizes */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-auto">
-            {filteredItems.map((item, index) => {
-              // Make first item span 2 columns on large screens (featured)
-              const isFeatured = index === 0 && activeCategory === "all";
-              return (
-                <div
-                  key={item.id}
-                  className={`${isFeatured ? "lg:col-span-2 lg:row-span-1" : ""}`}
-                >
-                  <GalleryCard item={item} index={index} />
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredItems.map((item, index) => (
+              <GalleryCard key={item.id} item={item} index={index} />
+            ))}
           </div>
 
-          {/* Empty state */}
           {filteredItems.length === 0 && (
-            <div className="text-center py-20 text-[var(--muted-fg)]">
+            <div className="text-center py-20 text-[#787774]">
               <p>No items in this category yet.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* ─── Waitlist CTA ──────────────────────────────────── */}
-      <section className="px-4 pb-24">
-        <div className="max-w-2xl mx-auto">
-          <div className="card-surface p-10 md:p-14 text-center relative overflow-hidden">
-            {/* Ambient glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-32 bg-[var(--accent)] opacity-5 blur-3xl pointer-events-none" />
-
-            <div className="relative">
-              <span className="badge-accent mb-6 inline-flex">
-                <svg
-                  width="8"
-                  height="8"
-                  viewBox="0 0 8 8"
-                  fill="currentColor"
-                  className="opacity-60"
-                >
-                  <circle cx="4" cy="4" r="4" />
-                </svg>
-                Early access
-              </span>
-
-              <h2 className="font-display text-3xl md:text-4xl font-bold text-[var(--foreground)] mb-3">
-                Want to see your products here?
-              </h2>
-
-              <p className="text-[var(--muted-fg)] mb-8 max-w-md mx-auto">
-                Join the waitlist and be first to generate real outputs with ListMyProduct.
-              </p>
-
-              <form
-                className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-                onSubmit={(e) => e.preventDefault()}
-              >
-                <input
-                  type="email"
-                  placeholder="you@seller.com"
-                  required
-                  className="flex-1 bg-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-fg)] focus:outline-none focus:border-[var(--accent)] transition-colors"
-                />
-                <button type="submit" className="btn-primary whitespace-nowrap">
-                  Reserve my free credits
-                </button>
-              </form>
-
-              <p className="text-xs text-[var(--muted-fg)] opacity-60 mt-4">
-                No credit card required. Free credits on launch.
-              </p>
-            </div>
+      {/* CTA */}
+      <section className="bg-[#0F0E0D] py-20 px-4">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2
+            className="text-3xl md:text-4xl font-bold text-white"
+            style={{ fontFamily: "var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif" }}
+          >
+            Want to generate your own?
+          </h2>
+          <p className="mt-4 text-[#787774] text-lg">
+            Join the waitlist and be first to generate real outputs with ListMyProduct.
+          </p>
+          <div className="mt-8 max-w-md mx-auto">
+            <NotifyMeForm
+              placeholder="you@seller.com"
+              buttonText="Reserve my free credits"
+              variant="primary"
+            />
           </div>
         </div>
       </section>

@@ -1,9 +1,5 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Why ListMyProduct — compare listing tools",
-};
+import { MarketingPageShell } from "@/components/marketing/marketing-page-shell";
 
 export default function CompareLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <MarketingPageShell>{children}</MarketingPageShell>;
 }

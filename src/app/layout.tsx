@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { SiteHeader } from "@/components/marketing/site-header";
-import { SiteFooter } from "@/components/marketing/site-footer";
+import { MarketingPageShell } from "@/components/marketing/marketing-page-shell";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -16,21 +15,21 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://listmyproduct.com"),
-  title: "ListMyProduct — AI product imagery for marketplace sellers",
+  title: "ListMyProduct — AI listing studio for Amazon sellers",
   description:
-    "Upload one product photo. Get studio-quality listing images for Amazon, eBay, Etsy and EU marketplaces. No photoshoot. No designer.",
+    "Upload one product photo. AI generates Amazon listing copy, A+ content images, and video — from a single product photo.",
   openGraph: {
-    title: "ListMyProduct — AI product imagery for marketplace sellers",
+    title: "ListMyProduct — AI listing studio for Amazon sellers",
     description:
-      "Upload one product photo. Get studio-quality listing images for Amazon, eBay, Etsy and EU marketplaces. No photoshoot. No designer.",
+      "Upload one product photo. AI generates Amazon listing copy, A+ content images, and video — from a single product photo.",
     siteName: "ListMyProduct",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ListMyProduct — AI product imagery for marketplace sellers",
+    title: "ListMyProduct — AI listing studio for Amazon sellers",
     description:
-      "Upload one product photo. Get studio-quality listing images for Amazon, eBay, Etsy and EU marketplaces.",
+      "Upload one product photo. AI generates Amazon listing copy, A+ content images, and video.",
   },
   icons: {
     icon: "/logo.png",
@@ -42,9 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${spaceGrotesk.variable} antialiased`}>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
+        <MarketingPageShell>{children}</MarketingPageShell>
       </body>
     </html>
   );

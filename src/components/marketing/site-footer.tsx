@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { TwitterLogo, LinkedinLogo, YoutubeLogo, GithubLogo } from "@phosphor-icons/react";
 

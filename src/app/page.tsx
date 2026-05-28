@@ -413,7 +413,7 @@ function FeaturesBentoSection() {
                   Brand Consistency
                 </h4>
                 <p className="text-xs text-[#0F0E0D]/55 leading-relaxed">
-                  Every output maintains your brand's visual language and tone — no drift across marketplace formats.
+                  Every output maintains your brand&apos;s visual language and tone — no drift across marketplace formats.
                 </p>
               </div>
             </div>

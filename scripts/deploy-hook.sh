@@ -1,4 +1,8 @@
 #!/bin/bash
-# listmyproduct shares the productpixl database — no schema push needed.
-# Vercel runs its own build after this script exits.
-exit 0
+# Vercel build hook — runs before Vercel packages and uploads the output.
+# listmyproduct shares productpixl's DB, no schema push needed.
+# We must run next build here so .next/ exists for Vercel to upload.
+set -e
+echo "==> [deploy-hook] Running production build..."
+next build
+echo "==> [deploy-hook] Build complete"

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { MarketingPageShell } from "@/components/marketing/marketing-page-shell";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -41,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${spaceGrotesk.variable} antialiased`}>
-        <MarketingPageShell>{children}</MarketingPageShell>
+        {children}
       </body>
     </html>
   );

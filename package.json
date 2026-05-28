@@ -1,0 +1,79 @@
+{
+  "name": "listmyproduct",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 3001",
+    "inngest:dev": "inngest-cli dev -u http://localhost:3001/api/inngest",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:push": "bash -c 'set -a && . ./.env.local && set +a && prisma db push'",
+    "test:api": "bash -c 'set -a && . ./.env.local && set +a && SMOKE_BASE_URL=http://localhost:3002 pnpm dlx tsx scripts/api-smoke-test.ts'",
+    "test:e2e-ready": "bash -c 'set -a && . ./.env.local && set +a && npx tsx scripts/e2e-readiness.ts'",
+    "test:smoke:prod": "bash -c 'set -a && . ./.env.local && set +a && pnpm dlx tsx scripts/production-smoke-test.ts'",
+    "test:e2e": "bash -c 'set -a && . ./.env.local && set +a && playwright test'",
+    "test:e2e:ui": "bash -c 'set -a && . ./.env.local && set +a && playwright test --ui'",
+    "test:e2e:install": "playwright install chromium",
+    "reset:stuck": "bash -c 'set -a && . ./.env.local && set +a && npx tsx scripts/reset-stuck-products.ts'",
+    "dev:fresh": "bash scripts/dev-fresh.sh",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.7.4",
+    "@gsap/react": "^2.1.2",
+    "@phosphor-icons/react": "^2.1.10",
+    "@prisma/client": "^5.22.0",
+    "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-select": "^2.1.4",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-tabs": "^1.1.2",
+    "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.5.1",
+    "clsx": "^2.1.1",
+    "gsap": "^3.15.0",
+    "inngest": "^3.28.0",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.469.0",
+    "next": "15.5.18",
+    "next-auth": "^5.0.0-beta.25",
+    "nodemailer": "^8.0.8",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "replicate": "^1.0.1",
+    "resend": "^6.12.4",
+    "sharp": "^0.34.5",
+    "stripe": "^17.4.0",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.13"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@playwright/test": "1.51.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/nodemailer": "^8.0.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.18",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "protobufjs",
+      "unrs-resolver"
+    ]
+  }
+}
